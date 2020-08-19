@@ -12,6 +12,11 @@
 
     <properties>
         <servlet.container.port>10000</servlet.container.port>
+        <h2.version>1.4.200</h2.version>
+
+        <surefire.version>2.22.0</surefire.version>
+        <failsafe.version>2.22.0</failsafe.version>
+        <jetty.version>9.4.31.v20200723</jetty.version>
     </properties>
 
     <dependencies>
@@ -51,27 +56,41 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.187</version>
+            <version>${h2.version}</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- This runs unit-tests named without an "IT" suffix. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <argLine>
+                        --illegal-access=permit
+                    </argLine>
+                    <excludes>
+                        <exclude>**/*IT</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
             <!--  This runs integration tests named with an "IT" suffix. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20</version>
+                <version>${failsafe.version}</version>
+                <configuration>
+                    <argLine>
+                        --illegal-access=permit
+                    </argLine>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>integration-test</id>
                         <goals>
                             <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
@@ -82,16 +101,13 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.2.2.v20140723</version>
+                <version>${jetty.version}</version>
                 <configuration>
                     <httpConnector>
                         <port>${servlet.container.port}</port>
                     </httpConnector>
-                    <webApp>
-                        <contextPath>/</contextPath>
-                    </webApp>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <stopPort>8005</stopPort>
+                    <stopPort>9000</stopPort>
                     <stopKey>STOP</stopKey>
                 </configuration>
                 <executions>
@@ -99,12 +115,8 @@
                         <id>start-jetty</id>
                         <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>run-war</goal>
+                            <goal>start</goal>
                         </goals>
-                        <configuration>
-                            <scanIntervalSeconds>0</scanIntervalSeconds>
-                            <daemon>true</daemon>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>stop-jetty</id>

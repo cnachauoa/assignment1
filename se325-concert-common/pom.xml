@@ -8,6 +8,10 @@
     </parent>
     <artifactId>assignment-01-concert-common</artifactId>
 
+    <properties>
+        <jackson.version>2.10.5</jackson.version>
+    </properties>
+
     <dependencies>
         <!-- Jackson - just the annotations and custom serialization. Don't need to depend on the entire library
         for the domain model. Scope is provided since we know we'll be deploying this with our server which already
@@ -15,13 +19,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
